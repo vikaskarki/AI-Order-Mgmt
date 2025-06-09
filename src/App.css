@@ -1,0 +1,54 @@
+/* Ensure full screen */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* Main layout flexbox */
+.main-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* Vertical center */
+  align-items: center;      /* Horizontal center */
+  text-align: center;
+}
+
+/* Title */
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 30px;
+}
+
+/* Box around QR and input */
+.qr-box {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Instruction text */
+.instruction {
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Input */
+.url-input {
+  margin-top: 20px;
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
