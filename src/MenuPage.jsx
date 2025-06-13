@@ -1,65 +1,121 @@
-import React, { useState } from 'react';
-import './MenuPage.css'; // Import the CSS here
+import React, { useEffect, useState } from 'react';
+import { database, ref, onValue } from './firebase';
+import './MenuPage.css';
 
 const MenuPage = () => {
+  const [menuData, setMenuData] = useState({});
   const [orderSummary, setOrderSummary] = useState([]);
+  const [quantities, setQuantities] = useState({});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const selectedItems = [];
-
-    form.querySelectorAll('input[type="checkbox"]:checked').forEach((input) => {
-      const itemName = input.value;
-      const itemKey = itemName.toLowerCase().replace(/\s/g, '_');
-      const custom = formData.get(`${itemKey}_custom`) || '';
-      selectedItems.push(`${itemName}${custom ? ` (Mod: ${custom})` : ''}`);
+  useEffect(() => {
+    const menuRef = ref(database, '/menu');
+    onValue(menuRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setMenuData(data);
+      }
     });
+  }, []);
 
-    setOrderSummary(selectedItems);
+  const handleQuantityChange = (key, change) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [key]: Math.max(1, (prev[key] || 1) + change),
+    }));
   };
+
+  const handleAddToOrder = (itemKey, itemName, custom) => {
+    const quantity = quantities[itemKey] || 1;
+    const note = custom ? ` (Note: ${custom})` : '';
+    setOrderSummary((prev) => [...prev, `${itemName} x${quantity}${note}`]);
+  };
+
+  const MenuImage = ({ src, alt, className}) => (
+    <img
+      src={src}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      className={className}
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = 'https://placehold.co/100x100?text=No+Image';
+      }}
+    />
+  );
 
   return (
     <div className="menu-container">
-      <div className="ai-message">
-        👋 Hi, I’m AI-Waiter! Here’s the list of the menu. What would you like to order?
+      <h2 className="ai-message">👋 Welcome! Choose your favorites below.</h2>
+
+      {[
+  'Tea (Milk Base)',
+  'Quick Bites',
+  'Tea (Water Base)',
+  'Smokes',
+  'Hookah',
+  'Mohi and Dahi',
+  'Drinks'
+].map((section) =>
+  menuData[section] ? (
+    <div key={section} className="category-section">
+      <h3 className="category-title">{section}</h3>
+      <div className="carousel">
+        {Object.entries(menuData[section]).map(([key, item]) => {
+          const itemKey = key.toLowerCase().replace(/\s/g, '_');
+          return (
+            <div className="menu-card" key={itemKey}>
+              <MenuImage src={item.imageURL} alt={item.name} className="item-img" />
+              <div className="menu-info">
+                <h4 className="menu-name">{item.name}</h4>
+                <div className="menu-price">Rs. {item.price}</div>
+
+                <div className="quantity-controls">
+                  <button type="button" onClick={() => handleQuantityChange(itemKey, -1)}>−</button>
+                  <span>{quantities[itemKey] || 1}</span>
+                  <button type="button" onClick={() => handleQuantityChange(itemKey, 1)}>+</button>
+                </div>
+
+                <input
+                  type="text"
+                  name={`${itemKey}_custom`}
+                  className="menu-custom-input"
+                  placeholder="Special instructions"
+                  onChange={(e) =>
+                    setQuantities((prev) => ({
+                      ...prev,
+                      [`${itemKey}_note`]: e.target.value,
+                    }))
+                  }
+                />
+                <button
+                  type="button"
+                  className="add-btn"
+                  onClick={() =>
+                    handleAddToOrder(
+                      itemKey,
+                      item.name,
+                      quantities[`${itemKey}_note`]
+                    )
+                  }
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
+    </div>
+  ) : null // 🛑 skip if menuData[section] is missing
+)}
 
-      <form onSubmit={handleSubmit}>
-        <div className="menu-item">
-          <label>
-            <input type="checkbox" name="order" value="Milk Tea" />
-            Milk Tea
-          </label>
-          <input type="text" name="milk_tea_custom" placeholder="Modifications (e.g. sugar free)" />
-        </div>
-
-        <div className="menu-item">
-          <label>
-            <input type="checkbox" name="order" value="Brownie" />
-            Brownie
-          </label>
-          <input type="text" name="brownie_custom" placeholder="Modifications (e.g. extra chocolate)" />
-        </div>
-
-        <div className="menu-item">
-          <label>
-            <input type="checkbox" name="order" value="Margherita" />
-            Margherita
-          </label>
-          <input type="text" name="margherita_custom" placeholder="Modifications (e.g. extra cheese)" />
-        </div>
-
-        <button type="submit" className="submit-btn">Place Order</button>
-      </form>
 
       {orderSummary.length > 0 && (
         <div className="order-summary">
-          <strong>📝 Order Summary:</strong>
+          <strong>🧾 Order Summary:</strong>
           <ul>
-            {orderSummary.map((item, index) => (
-              <li key={index}>• {item}</li>
+            {orderSummary.map((item, i) => (
+              <li key={i}>• {item}</li>
             ))}
           </ul>
         </div>

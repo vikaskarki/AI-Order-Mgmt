@@ -3,8 +3,10 @@ html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
+  min-height: 100%;
+  background: radial-gradient(#fef7e5, #e4cbb1);
   width: 100%;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Playfair Display', serif;
   background-color: #f4f4f4;
 }
 

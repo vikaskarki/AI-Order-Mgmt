@@ -6,7 +6,8 @@ import MenuPage from "./MenuPage"; // Corrected path
 
 // Home component that shows QR code
 const Home = () => {
-  const [orderURL] = useState("https://192.168.56.1:5173/menu");
+  const orderURL = "https://ai-order-mgmt.vercel.app/menu";
+
 
   return (
     <div className="main-container">
