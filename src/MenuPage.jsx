@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { database, ref, onValue } from './firebase';
 import './MenuPage.css';
 
@@ -6,6 +6,21 @@ const MenuPage = () => {
   const [menuData, setMenuData] = useState({});
   const [orderSummary, setOrderSummary] = useState([]);
   const [quantities, setQuantities] = useState({});
+
+  const categories =[
+    'Tea (Milk Base)',
+    'Quick Bites',
+    'Tea (Water Base)',
+    'Smokes',
+    'Hookah',
+    'Mohi and Dahi',
+    'Drinks'
+  ];
+
+  const sectionRefs = useRef(categories.reduce((acc, value) => {
+    acc[value] = React.createRef();
+    return acc;
+  }, {}));
 
   useEffect(() => {
     const menuRef = ref(database, '/menu');
@@ -16,6 +31,13 @@ const MenuPage = () => {
       }
     });
   }, []);
+
+  const handleScrollTo = (section) => {
+    const ref = sectionRefs.current[section];
+  if (ref && ref.current) {
+    ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  };
 
   const handleQuantityChange = (key, change) => {
     setQuantities((prev) => ({
@@ -45,19 +67,17 @@ const MenuPage = () => {
 
   return (
     <div className="menu-container">
+       {/* 🔸 Category Navigation Bar */}
+      <div className="category-nav">
+        {categories.map((cat) => (
+          <button key={cat} onClick={() => handleScrollTo(cat)}>{cat}</button>
+        ))}
+      </div>
       <h2 className="ai-message">👋 Welcome! Choose your favorites below.</h2>
 
-      {[
-  'Tea (Milk Base)',
-  'Quick Bites',
-  'Tea (Water Base)',
-  'Smokes',
-  'Hookah',
-  'Mohi and Dahi',
-  'Drinks'
-].map((section) =>
+ {categories.map((section) =>
   menuData[section] ? (
-    <div key={section} className="category-section">
+    <div key={section} ref={sectionRefs.current[section]} className="category-section">
       <h3 className="category-title">{section}</h3>
       <div className="carousel">
         {Object.entries(menuData[section]).map(([key, item]) => {
