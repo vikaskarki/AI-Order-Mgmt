@@ -266,6 +266,28 @@ body {
   background-color: #dd8746;
 }
 
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #a96e44; /* cafe-style brown */
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+.back-to-top:hover {
+  background-color: #8a5534;
+}
+
+
 /* ✅ Responsive breakpoints */
 @media (max-width: 992px) {
   .carousel {

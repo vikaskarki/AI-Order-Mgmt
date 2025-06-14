@@ -6,6 +6,8 @@ const MenuPage = () => {
   const [menuData, setMenuData] = useState({});
   const [orderSummary, setOrderSummary] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
 
   const categories =[
     'Tea (Milk Base)',
@@ -30,6 +32,17 @@ const MenuPage = () => {
         setMenuData(data);
       }
     });
+
+    const handleScroll = () => {
+    if (window.scrollY > 300) {
+      setShowScrollTop(true);
+    } else {
+      setShowScrollTop(false);
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleScrollTo = (section) => {
@@ -120,6 +133,16 @@ const MenuPage = () => {
                 >
                   Add
                 </button>
+                
+                {showScrollTop && (
+                  <button
+                    className="back-to-top"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  >
+                    ⬆ Back to Top
+                  </button>
+                )}
+
               </div>
             </div>
           );
